@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Calculator</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #111;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* LIGHT MODE */
+body.light {
+    background: #f5f5f5;
+    color: black;
+}
+
+.calculator {
+    width: 350px;
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+body.light .calculator {
+    background: white;
+}
+
+.display {
+    background: black;
+    color: lime;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 22px;
+    text-align: right;
+    min-height: 50px;
+    margin-bottom: 10px;
+}
+
+.history {
+    font-size: 12px;
+    height: 60px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.num { background: #444; color: white; }
+.op { background: orange; }
+.func { background: #00c853; }
+.equal { background: red; grid-column: span 2; }
+
+.toggle {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <div class="toggle">
+        <button onclick="toggleMode()">🌙/☀️</button>
+        <button onclick="toggleAngle()">DEG/RAD</button>
+    </div>
+
+    <div class="history" id="history"></div>
+    <div class="display" id="display"></div>
+
+    <div class="buttons">
+        <button onclick="clearDisplay()">C</button>
+        <button onclick="del()">DEL</button>
+        <button onclick="append('(')">(</button>
+        <button onclick="append(')')">)</button>
+        <button onclick="append('/')">/</button>
+
+        <button class="num" onclick="append('7')">7</button>
+        <button class="num" onclick="append('8')">8</button>
+        <button class="num" onclick="append('9')">9</button>
+        <button onclick="append('*')">*</button>
+        <button onclick="func('sqrt')">√</button>
+
+        <button class="num" onclick="append('4')">4</button>
+        <button class="num" onclick="append('5')">5</button>
+        <button class="num" onclick="append('6')">6</button>
+        <button onclick="append('-')">-</button>
+        <button onclick="func('log')">log</button>
+
+        <button class="num" onclick="append('1')">1</button>
+        <button class="num" onclick="append('2')">2</button>
+        <button class="num" onclick="append('3')">3</button>
+        <button onclick="append('+')">+</button>
+        <button onclick="func('sin')">sin</button>
+
+        <button class="num" onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button onclick="func('cos')">cos</button>
+        <button onclick="func('tan')">tan</button>
+        <button onclick="append('**')">x²</button>
+
+        <button class="equal" onclick="calculate()">=</button>
+    </div>
+</div>
+
+<script>
+let display = document.getElementById("display");
+let history = document.getElementById("history");
+
+let isDegree = true;
+
+/* BASIC */
+function append(val) {
+    display.innerText += val;
+}
+
+function clearDisplay() {
+    display.innerText = "";
+}
+
+function del() {
+    display.innerText = display.innerText.slice(0, -1);
+}
+
+/* CALCULATE */
+function calculate() {
+    try {
+        let exp = display.innerText;
+        let result = eval(exp);
+        history.innerHTML += exp + " = " + result + "<br>";
+        display.innerText = result;
+    } catch {
+        display.innerText = "Error";
+    }
+}
+
+/* FUNCTIONS */
+function func(type) {
+    let val = parseFloat(display.innerText);
+    if (isNaN(val)) return;
+
+    if (isDegree) val = val * Math.PI / 180;
+
+    let res;
+    switch(type) {
+        case 'sqrt': res = Math.sqrt(val); break;
+        case 'log': res = Math.log10(val); break;
+        case 'sin': res = Math.sin(val); break;
+        case 'cos': res = Math.cos(val); break;
+        case 'tan': res = Math.tan(val); break;
+    }
+
+    display.innerText = res;
+}
+
+/* MODE */
+function toggleMode() {
+    document.body.classList.toggle("light");
+}
+
+/* DEG/RAD */
+function toggleAngle() {
+    isDegree = !isDegree;
+    alert(isDegree ? "Degree Mode" : "Radian Mode");
+}
+
+/* KEYBOARD SUPPORT */
+document.addEventListener("keydown", (e) => {
+    if (!isNaN(e.key) || "+-*/().".includes(e.key)) {
+        append(e.key);
+    } else if (e.key === "Enter") {
+        calculate();
+    } else if (e.key === "Backspace") {
+        del();
+    }
+});
+</script>
+
+</body>
+</html>
